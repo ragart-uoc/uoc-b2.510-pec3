@@ -45,7 +45,7 @@ namespace B2510.Entities.CharacterStates
                     _character.ChangeState(CharacterProperties.States.IdleMove);
                     break;
                 case CharacterProperties.Events.HitStarted:
-                    // TODO: Play defend sound
+                    _character.audioSource.PlayOneShot(_character.AudioClips["defend"]);
                     break;
                 case CharacterProperties.Events.DeadStarted:
                     _character.ChangeState(CharacterProperties.States.Dead);

@@ -41,8 +41,10 @@ namespace B2510.Entities.CharacterStates
             switch (characterEvent)
             {
                 case CharacterProperties.Events.AttackPerformed:
-                    if (_character.collidingCharacter != null)
-                        _character.collidingCharacter.Hit();
+                    if (_character.collidingCharacter == null)
+                        return;
+                    _character.collidingCharacter.Hit();
+                    _character.audioSource.PlayOneShot(_character.AudioClips["hit"]);
                     break;
                 case CharacterProperties.Events.AttackFinished:
                     _character.ChangeState(CharacterProperties.States.IdleMove);

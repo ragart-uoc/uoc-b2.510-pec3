@@ -41,6 +41,7 @@ namespace B2510.Entities.CharacterStates
             switch (characterEvent)
             {
                 case CharacterProperties.Events.JumpFinished:
+                    _character.audioSource.PlayOneShot(_character.AudioClips["jump"]);
                     _character.ChangeState(CharacterProperties.States.IdleMove);
                     break;
                 case CharacterProperties.Events.HitStarted:

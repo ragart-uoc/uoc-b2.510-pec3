@@ -105,6 +105,16 @@ namespace B2510.Entities
             public Image healthBar;
             
         #endregion
+        
+        #region Audio References
+        
+            /// <value>Property <c>audioSource</c> represents the audio source.</value>
+            public AudioSource audioSource;
+            
+            /// <value>Property <c>AudioClips</c> represents a dictionary containing all sounds and music for this object.</value>
+            public Dictionary<string, AudioClip> AudioClips = new Dictionary<string, AudioClip>();
+        
+        #endregion
 
         /// <summary>
         /// Method <c>Awake</c> is called when the script instance is being loaded.
@@ -117,6 +127,15 @@ namespace B2510.Entities
             // Get the components
             playerInput = (playerInput == null) ? GetComponent<PlayerInput>() : playerInput;
             animator = (animator == null) ? GetComponent<Animator>() : animator;
+            audioSource = (audioSource == null) ? GetComponent<AudioSource>() : audioSource;
+            
+            // Get the audio clips
+            var audioClips = Resources.LoadAll<AudioClip>("Sounds/Character");
+            foreach (var audioClip in audioClips)
+            {
+                Debug.Log(audioClip.name);
+                AudioClips.Add(audioClip.name, audioClip);
+            }
 
             // Initialize the character states
             _characterStates.Add(CharacterProperties.States.Default, new DefaultState(this));
@@ -197,6 +216,7 @@ namespace B2510.Entities
             public void GetHit()
             {
                 animator.SetTrigger(_animatorHit);
+                audioSource.PlayOneShot(AudioClips["hit"]);
                 healthPoints -= damagePerHit;
                 healthBar.fillAmount = healthPoints / maxHealthPoints;
             }

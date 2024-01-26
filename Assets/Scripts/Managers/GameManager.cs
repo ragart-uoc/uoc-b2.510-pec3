@@ -46,6 +46,12 @@ namespace B2510.Managers
 
         /// <value>Property <c>_roundActive</c> represents if the round is active.</value>
         private bool _roundActive;
+        
+        /// <value>Property <c>_audioSource</c> represents the audio source.</value>
+        private AudioSource _audioSource;
+        
+        /// <value>Property <c>AudioClips</c> represents a dictionary containing all sounds and music for this object.</value>
+        public Dictionary<string, AudioClip> AudioClips = new Dictionary<string, AudioClip>();
 
         /// <summary>
         /// Method <c>Awake</c> is called when the script instance is being loaded.
@@ -60,8 +66,18 @@ namespace B2510.Managers
             }
             Instance = this;
             
+            // Get the components
+            _audioSource = GetComponent<AudioSource>();
+            
             // Get the UI manager
             _uiManager = FindObjectOfType<UIManager>();
+            
+            // Get the audio clips
+            var audioClips = Resources.LoadAll<AudioClip>("Sounds/Game");
+            foreach (var audioClip in audioClips)
+            {
+                AudioClips.Add(audioClip.name, audioClip);
+            }
         }
         
         /// <summary>
@@ -133,11 +149,19 @@ namespace B2510.Managers
             // Display the round number in the notice text
             _uiManager.UpdateNoticeText($"Round {_roundNumber}");
             
+            // Play the round start sound
+            _audioSource.PlayOneShot(_roundNumber is >= 1 and <= 3
+                ? AudioClips["round" + _roundNumber]
+                : AudioClips["roundnext"]);
+
             // Wait
             yield return new WaitForSeconds(2f);
             
             // Display the fight text
             _uiManager.UpdateNoticeText("Fight!");
+            
+            // Play the fight sound
+            _audioSource.PlayOneShot(AudioClips["fight"]);
             
             // Wait
             yield return new WaitForSeconds(1f);
@@ -185,6 +209,9 @@ namespace B2510.Managers
             
             // Display the round winner (if null, it's a draw)
             _uiManager.UpdateNoticeText(_roundWinner == null ? "Draw" : $"{_roundWinner.characterName} wins the round");
+            
+            // Play the round end sound
+            _audioSource.PlayOneShot(_roundWinner == null ? AudioClips["draw"] : AudioClips["win"]);
             
             // Wait
             yield return new WaitForSeconds(2f);
@@ -253,6 +280,9 @@ namespace B2510.Managers
         {
             // Display the game winner
             _uiManager.UpdateNoticeText($"{_gameWinner.characterName} wins!");
+            
+            // Play the game end sound
+            _audioSource.PlayOneShot(AudioClips["gameover"]);
             
             // Show the pause menu
             _uiManager.EnablePauseMenu(true);
