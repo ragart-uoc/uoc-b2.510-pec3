@@ -271,6 +271,9 @@ namespace B2510.Managers
             
             // Increment the rounds won
             _roundsWon[_roundWinner]++;
+            
+            // Update the UI
+            _roundWinner.winsText.text = $"Wins: {_roundsWon[_roundWinner]}";
 
             return true;
         }

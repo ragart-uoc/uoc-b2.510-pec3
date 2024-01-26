@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using TMPro;
 using B2510.Entities.CharacterStates;
 
 namespace B2510.Entities
@@ -104,6 +105,12 @@ namespace B2510.Entities
             /// <value>Property <c>healthBar</c> is used to reference the health bar.</value>
             public Image healthBar;
             
+            /// <value>Property <c>characterNameText</c> is used to reference the character name text.</value>
+            public TextMeshProUGUI characterNameText;
+            
+            /// <value>Property <c>winsText</c> is used to reference the wins text.</value>
+            public TextMeshProUGUI winsText;
+            
         #endregion
         
         #region Audio References
@@ -155,6 +162,13 @@ namespace B2510.Entities
         /// </summary>
         private void Start()
         {
+            // Set the character name
+            characterNameText.text = characterName;
+            
+            // Set the wins text
+            winsText.text = "Wins: 0";
+
+            // Start the current state
             CurrentState.StartState();
         }
         
@@ -163,6 +177,7 @@ namespace B2510.Entities
         /// </summary>
         private void Update()
         {
+            // Update the current state
             CurrentState.UpdateState();
         }
         
