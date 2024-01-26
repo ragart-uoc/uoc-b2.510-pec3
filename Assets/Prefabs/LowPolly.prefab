@@ -982,12 +982,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterState: 0
+  playerInput: {fileID: 0}
   animator: {fileID: 0}
+  characterName: LowPolly
+  maxHealthPoints: 10
   healthPoints: 10
   moveSpeed: 5
   damagePerHit: 1
   moveInput: {x: 0, y: 0}
-  collidingPlayer: {fileID: 0}
+  collidingCharacter: {fileID: 0}
 --- !u!114 &5824740845008184520
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using B2510.Entities.CharacterStates;
 
 namespace B2510.Entities
@@ -34,6 +35,9 @@ namespace B2510.Entities
         #endregion
 
         #region Character Attributes
+        
+            /// <value>Property <c>characterName</c> is used to reference the character name.</value>
+            public string characterName;
         
             /// <value>Property <c>maxHealthPoints</c> is used to reference the maximum health points.</value>
             public float maxHealthPoints = 10f; 
@@ -93,6 +97,13 @@ namespace B2510.Entities
             /// <value>Property <c>_animatorDead</c> is used to reference the dead parameter.</value>
             private readonly int _animatorDead = Animator.StringToHash("Dead");
         
+        #endregion
+        
+        #region UI References
+
+            /// <value>Property <c>healthBar</c> is used to reference the health bar.</value>
+            public Image healthBar;
+            
         #endregion
 
         /// <summary>
@@ -187,6 +198,7 @@ namespace B2510.Entities
             {
                 animator.SetTrigger(_animatorHit);
                 healthPoints -= damagePerHit;
+                healthBar.fillAmount = healthPoints / maxHealthPoints;
             }
 
             /// <summary>
@@ -257,9 +269,6 @@ namespace B2510.Entities
                 animator.SetBool(_animatorDucking, false);
                 animator.SetBool(_animatorDefending, false);
                 animator.SetBool(_animatorDead, false);
-                
-                // Enable movement
-                EnableMovement(true);
             }
         
         #endregion

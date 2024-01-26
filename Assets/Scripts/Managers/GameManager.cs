@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using B2510.Entities;
 
 namespace B2510.Managers
@@ -43,6 +44,9 @@ namespace B2510.Managers
         /// <value>Property <c>_gameWinner</c> represents the game winner.</value>
         private Character _gameWinner;
 
+        /// <value>Property <c>_roundActive</c> represents if the round is active.</value>
+        private bool _roundActive;
+
         /// <summary>
         /// Method <c>Awake</c> is called when the script instance is being loaded.
         /// </summary>
@@ -72,6 +76,9 @@ namespace B2510.Managers
                 _roundsWon.Add(character, 0);
             }
             
+            // Ensure the timescale is set to 1
+            Time.timeScale = 1;
+            
             // Start the game loop
             StartCoroutine(GameLoop());
         }
@@ -81,8 +88,11 @@ namespace B2510.Managers
         /// </summary>
         private void FixedUpdate()
         {
-            // Update the round timer
+            // Update the timer
+            if (!_roundActive)
+                return;
             _roundTimer -= Time.deltaTime;
+            _uiManager.UpdateTimerText(_roundTimer);
         }
         
         /// <summary>
@@ -110,16 +120,37 @@ namespace B2510.Managers
             
             // Reset the round timer
             _roundTimer = roundTime;
-
-            // Reset and activate the characters
+            
+            // Reset the round timer text
+            _uiManager.UpdateTimerText(_roundTimer);
+            
+            // Reset the characters
             foreach (var character in _characters)
             {
                 character.Reset();
-                character.ChangeState(CharacterProperties.States.IdleMove);
             }
             
-            // TODO: Display the round number
-            yield break;
+            // Display the round number in the notice text
+            _uiManager.UpdateNoticeText($"Round {_roundNumber}");
+            
+            // Wait
+            yield return new WaitForSeconds(2f);
+            
+            // Display the fight text
+            _uiManager.UpdateNoticeText("Fight!");
+            
+            // Wait
+            yield return new WaitForSeconds(1f);
+            
+            // Reset the notice text
+            _uiManager.UpdateNoticeText("");
+
+            // Activate the characters
+            foreach (var character in _characters)
+            {
+                character.EnableMovement(true);
+                character.ChangeState(CharacterProperties.States.IdleMove);
+            }
         }
         
         /// <summary>
@@ -127,6 +158,9 @@ namespace B2510.Managers
         /// </summary>
         private IEnumerator RoundPlaying()
         {
+            // Activate the round
+            _roundActive = true;
+
             // While there is no winner
             while (!CheckRoundWinner() && !CheckRoundTime())
             {
@@ -140,13 +174,20 @@ namespace B2510.Managers
         /// </summary>
         private IEnumerator RoundEnding()
         {
+            // Set the round as inactive
+            _roundActive = false;
+
             // Prevent the characters from moving
             foreach (var character in _characters)
             {
                 character.EnableMovement(false);
             }
             
-            // TODO: Display the round winner (if null, it's a draw)
+            // Display the round winner (if null, it's a draw)
+            _uiManager.UpdateNoticeText(_roundWinner == null ? "Draw" : $"{_roundWinner.characterName} wins the round");
+            
+            // Wait
+            yield return new WaitForSeconds(2f);
 
             // Check if there is a game winner
             if (CheckGameWinner())
@@ -210,9 +251,11 @@ namespace B2510.Managers
         /// </summary>
         private void EndGame()
         {
-            // TODO: Display the game winner
+            // Display the game winner
+            _uiManager.UpdateNoticeText($"{_gameWinner.characterName} wins!");
             
-            // TODO: Enable the end game menu
+            // Show the pause menu
+            _uiManager.EnablePauseMenu(true);
         }
 
         /// <summary>
@@ -220,7 +263,9 @@ namespace B2510.Managers
         /// </summary>
         private void OnPause()
         {
-            TogglePause();
+            // Check if the game can be paused
+            if (_roundActive)
+                TogglePause();
         }
         
         /// <summary>
@@ -240,7 +285,37 @@ namespace B2510.Managers
             }
             
             // Toggle the pause menu
-            _uiManager.EnablePauseMenu(gamePaused);
+            _uiManager.EnablePauseMenu(!gamePaused);
+            
+            // Show the notice text
+            _uiManager.UpdateNoticeText(gamePaused ? "" : "Pause");
+        }
+
+        /// <summary>
+        /// Method <c>RestartGame</c> restarts the game.
+        /// </summary>
+        public void RestartGame()
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+        
+        /// <summary>
+        /// Method <c>LoadMainMenu</c> loads the main menu.
+        /// </summary>
+        public void LoadMainMenu()
+        {
+            SceneManager.LoadScene("MainMenu");
+        }
+
+        /// <summary>
+        /// Method <c>QuitGame</c> is used to quit the game.
+        /// </summary>
+        public void QuitGame()
+        {
+            Application.Quit();
+            #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+            #endif
         }
     }
 }

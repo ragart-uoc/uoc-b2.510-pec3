@@ -2751,11 +2751,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterState: 0
+  playerInput: {fileID: 0}
   animator: {fileID: 0}
+  characterName: Cagebot
+  maxHealthPoints: 10
   healthPoints: 10
   moveSpeed: 5
   damagePerHit: 1
   moveInput: {x: 0, y: 0}
+  collidingCharacter: {fileID: 0}
 --- !u!114 &6364083308188437469
 MonoBehaviour:
   m_ObjectHideFlags: 0
