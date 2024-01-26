@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using B2510.Entities;
+using PolyverseSkiesAsset;
 
 namespace B2510.Managers
 {
@@ -16,7 +17,12 @@ namespace B2510.Managers
         public static GameManager Instance;
         
         /// <value>Property <c>_uiManager</c> represents the UI manager.</value>
-        private UIManager _uiManager;
+        [SerializeField]
+        private UIManager uiManager;
+        
+        /// <value>Property <c>_polyverseSkies</c> represents the Polyverse skies.</value>
+        [SerializeField]
+        private PolyverseSkies polyverseSkiesManager;
 
         /// <value>Property <c>_roundsToWin</c> represents the rounds to win.</value>
         [SerializeField]
@@ -47,6 +53,10 @@ namespace B2510.Managers
         /// <value>Property <c>_roundActive</c> represents if the round is active.</value>
         private bool _roundActive;
         
+        /// <value>Property <c>timeOfDay</c> represents the time of day.</value>
+        [SerializeField, Range(0, 1)]
+        private int timeOfDay = 1;
+        
         /// <value>Property <c>_audioSource</c> represents the audio source.</value>
         private AudioSource _audioSource;
         
@@ -69,8 +79,9 @@ namespace B2510.Managers
             // Get the components
             _audioSource = GetComponent<AudioSource>();
             
-            // Get the UI manager
-            _uiManager = FindObjectOfType<UIManager>();
+            // Get the other managers
+            uiManager = (uiManager == null) ? FindObjectOfType<UIManager>() : uiManager;
+            polyverseSkiesManager = (polyverseSkiesManager == null) ? FindObjectOfType<PolyverseSkies>() : polyverseSkiesManager;
             
             // Get the audio clips
             var audioClips = Resources.LoadAll<AudioClip>("Sounds/Game");
@@ -108,7 +119,11 @@ namespace B2510.Managers
             if (!_roundActive)
                 return;
             _roundTimer -= Time.deltaTime;
-            _uiManager.UpdateTimerText(_roundTimer);
+            uiManager.UpdateTimerText(_roundTimer);
+            
+            // Update the polyverse skies time of day (in the beginning of the round, the time of day is 1, at the end is 0)
+            var timeRatio = _roundTimer / roundTime;
+            polyverseSkiesManager.timeOfDay = (timeOfDay == 0) ? 1f - timeRatio : timeRatio;
         }
         
         /// <summary>
@@ -138,7 +153,10 @@ namespace B2510.Managers
             _roundTimer = roundTime;
             
             // Reset the round timer text
-            _uiManager.UpdateTimerText(_roundTimer);
+            uiManager.UpdateTimerText(_roundTimer);
+            
+            // Reset the time of day
+            polyverseSkiesManager.timeOfDay = timeOfDay;
             
             // Reset the characters
             foreach (var character in _characters)
@@ -147,7 +165,7 @@ namespace B2510.Managers
             }
             
             // Display the round number in the notice text
-            _uiManager.UpdateNoticeText($"Round {_roundNumber}");
+            uiManager.UpdateNoticeText($"Round {_roundNumber}");
             
             // Play the round start sound
             _audioSource.PlayOneShot(_roundNumber is >= 1 and <= 3
@@ -158,7 +176,7 @@ namespace B2510.Managers
             yield return new WaitForSeconds(2f);
             
             // Display the fight text
-            _uiManager.UpdateNoticeText("Fight!");
+            uiManager.UpdateNoticeText("Fight!");
             
             // Play the fight sound
             _audioSource.PlayOneShot(AudioClips["fight"]);
@@ -167,7 +185,7 @@ namespace B2510.Managers
             yield return new WaitForSeconds(1f);
             
             // Reset the notice text
-            _uiManager.UpdateNoticeText("");
+            uiManager.UpdateNoticeText("");
 
             // Activate the characters
             foreach (var character in _characters)
@@ -208,7 +226,7 @@ namespace B2510.Managers
             }
             
             // Display the round winner (if null, it's a draw)
-            _uiManager.UpdateNoticeText(_roundWinner == null ? "Draw" : $"{_roundWinner.characterName} wins the round");
+            uiManager.UpdateNoticeText(_roundWinner == null ? "Draw" : $"{_roundWinner.characterName} wins the round");
             
             // Play the round end sound
             _audioSource.PlayOneShot(_roundWinner == null ? AudioClips["draw"] : AudioClips["win"]);
@@ -279,13 +297,13 @@ namespace B2510.Managers
         private void EndGame()
         {
             // Display the game winner
-            _uiManager.UpdateNoticeText($"{_gameWinner.characterName} wins!");
+            uiManager.UpdateNoticeText($"{_gameWinner.characterName} wins!");
             
             // Play the game end sound
             _audioSource.PlayOneShot(AudioClips["gameover"]);
             
             // Show the pause menu
-            _uiManager.EnablePauseMenu(true);
+            uiManager.EnablePauseMenu(true);
         }
 
         /// <summary>
@@ -315,10 +333,10 @@ namespace B2510.Managers
             }
             
             // Toggle the pause menu
-            _uiManager.EnablePauseMenu(!gamePaused);
+            uiManager.EnablePauseMenu(!gamePaused);
             
             // Show the notice text
-            _uiManager.UpdateNoticeText(gamePaused ? "" : "Pause");
+            uiManager.UpdateNoticeText(gamePaused ? "" : "Pause");
         }
 
         /// <summary>
