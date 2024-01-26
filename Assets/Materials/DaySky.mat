@@ -13,6 +13,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _BACKGROUNDMODE_COLORS
+  - _ENABLECLOUDSROTATION_ON
   - _ENABLECLOUDS_ON
   - _ENABLEPATTERNOVERLAY_ON
   - _ENABLESUN_ON
@@ -96,14 +97,14 @@ Material:
     - _BumpScale: 1
     - _CloudsCat: 1
     - _CloudsHeight: 0
-    - _CloudsRotation: 1
+    - _CloudsRotation: 360
     - _CloudsRotationSpeed: 0.5
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _EnableBuiltinFog: 0
     - _EnableClouds: 1
-    - _EnableCloudsRotation: 0
+    - _EnableCloudsRotation: 1
     - _EnableFogMessage: 0
     - _EnableMoon: 0
     - _EnablePatternOverlay: 1
