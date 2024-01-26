@@ -133,7 +133,6 @@ namespace B2510.Entities
             var audioClips = Resources.LoadAll<AudioClip>("Sounds/Character");
             foreach (var audioClip in audioClips)
             {
-                Debug.Log(audioClip.name);
                 AudioClips.Add(audioClip.name, audioClip);
             }
 
@@ -283,6 +282,7 @@ namespace B2510.Entities
                 
                 // Reset health points
                 healthPoints = maxHealthPoints;
+                healthBar.fillAmount = healthPoints / maxHealthPoints;
                 
                 // Reset animator
                 animator.SetFloat(_animatorSpeed, 0);

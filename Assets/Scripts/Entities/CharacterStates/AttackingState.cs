@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace B2510.Entities.CharacterStates
 {
@@ -43,8 +44,8 @@ namespace B2510.Entities.CharacterStates
                 case CharacterProperties.Events.AttackPerformed:
                     if (_character.collidingCharacter == null)
                         return;
+                    _character.audioSource.PlayOneShot(_character.AudioClips["attack"]);
                     _character.collidingCharacter.Hit();
-                    _character.audioSource.PlayOneShot(_character.AudioClips["hit"]);
                     break;
                 case CharacterProperties.Events.AttackFinished:
                     _character.ChangeState(CharacterProperties.States.IdleMove);
